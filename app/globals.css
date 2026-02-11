@@ -122,4 +122,52 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .ProseMirror:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .ProseMirror {
+    min-height: 500px;
+  }
+
+  .prose ul {
+    list-style-type: disc !important;
+    padding-left: 1.5em !important;
+  }
+
+  .prose ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5em !important;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
+    font-style: normal;
+  }
+
+  .prose h1 {
+    font-size: 32px;
+  }
+  .prose h2 {
+    font-size: 24px;
+  }
+  .prose h3 {
+    font-size: 18px;
+  }
+  .prose h4 {
+    font-size: 16px;
+  }
+  .prose h5 {
+    font-size: 14px;
+  }
+  .prose h6 {
+    font-size: 12px;
+  }
 }

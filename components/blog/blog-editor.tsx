@@ -1,32 +1,48 @@
 "use client";
 
+import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
-import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Button } from "@/components/ui/button";
+import CharacterCount from "@tiptap/extension-character-count";
+
 import {
   Bold,
   Italic,
-  List,
+  Underline as UnderlineIcon,
+  List as ListIcon,
   ListOrdered,
+  Quote,
+  Type,
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
+  ImageIcon,
+  Undo,
+  Redo,
   AlignLeft,
   AlignCenter,
   AlignRight,
-  ImageIcon,
-  LinkIcon,
-  UnderlineIcon,
-  Heading1,
-  Heading2,
-  Quote,
-  Undo,
-  Redo,
 } from "lucide-react";
-import React from "react";
-import { Input } from "../ui/input";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+
+const headings = [
+  { level: 1, icon: <Heading1 className="h-4 w-4" /> },
+  { level: 2, icon: <Heading2 className="h-4 w-4" /> },
+  { level: 3, icon: <Heading3 className="h-4 w-4" /> },
+  { level: 4, icon: <Heading4 className="h-4 w-4" /> },
+  { level: 5, icon: <Heading5 className="h-4 w-4" /> },
+  { level: 6, icon: <Heading6 className="h-4 w-4" /> },
+];
 
 export default function BlogEditor({
   content,
@@ -37,14 +53,34 @@ export default function BlogEditor({
 }) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Underline,
-      Image.configure({
-        HTMLAttributes: { class: "rounded-lg max-w-full h-auto" },
+      // StarterKit sudah mencakup heading, bulletList, orderedList, blockquote, dll.
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+        // Pastikan bulletList dan orderedList aktif
+        bulletList: {},
+        orderedList: {},
       }),
-      Placeholder.configure({ placeholder: "Tulis isi blog anda di sini..." }),
-      Link.configure({ openOnClick: false }),
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-2xl border shadow-lg max-w-full my-8 mx-auto",
+        },
+      }),
+      Placeholder.configure({
+        placeholder: "Tuliskan cerita luar biasa anda di sini...",
+      }),
+      CharacterCount,
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: "text-primary underline underline-offset-4 cursor-pointer",
+        },
+      }),
     ],
     content: content,
     immediatelyRender: false,
@@ -55,140 +91,151 @@ export default function BlogEditor({
 
   if (!editor) return null;
 
-  // Fungsi Upload Gambar Lokal (Dummy)
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const url = event.target?.result as string;
-        editor.chain().focus().setImage({ src: url }).run();
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const setLink = () => {
-    const url = window.prompt("Masukkan URL Link");
-    if (url) editor.chain().focus().setLink({ href: url }).run();
+  // Handler untuk Image
+  const addImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (readerEvent) => {
+          editor
+            .chain()
+            .focus()
+            .setImage({ src: readerEvent.target?.result as string })
+            .run();
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   };
 
   return (
-    <div className="border rounded-md overflow-hidden bg-background ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-      {/* TOOLBAR */}
-      <div className="flex flex-wrap gap-1 p-2 bg-muted/30 border-b">
-        {/* Text Style */}
-        <div className="flex gap-1 mr-2 border-r pr-2">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            active={editor.isActive("bold")}
-            icon={<Bold />}
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            active={editor.isActive("italic")}
-            icon={<Italic />}
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            active={editor.isActive("underline")}
-            icon={<UnderlineIcon />}
-          />
-        </div>
+    <div className="flex flex-col min-h-150 w-full bg-background border rounded-3xl shadow-sm overflow-hidden border-muted-foreground/20">
+      <div className="flex flex-wrap items-center gap-1 p-3 border-b bg-muted/5 backdrop-blur-sm sticky top-0 z-30">
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          icon={<Undo className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          icon={<Redo className="h-4 w-4" />}
+        />
 
-        {/* Headings */}
-        <div className="flex gap-1 mr-2 border-r pr-2">
+        <Separator orientation="vertical" className="h-6 mx-1" />
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          active={editor.isActive("bold")}
+          icon={<Bold className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          active={editor.isActive("italic")}
+          icon={<Italic className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          active={editor.isActive("underline")}
+          icon={<UnderlineIcon className="h-4 w-4" />}
+        />
+
+        <Separator orientation="vertical" className="h-6 mx-1" />
+
+        {headings.map(({ level, icon }) => (
           <ToolbarButton
+            key={level}
             onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
+              editor
+                .chain()
+                .focus()
+                .toggleHeading({ level: level as any })
+                .run()
             }
-            active={editor.isActive("heading", { level: 1 })}
-            icon={<Heading1 />}
+            active={editor.isActive("heading", { level })}
+            icon={icon}
           />
-          <ToolbarButton
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            active={editor.isActive("heading", { level: 2 })}
-            icon={<Heading2 />}
-          />
-        </div>
+        ))}
 
-        {/* Alignment */}
-        <div className="flex gap-1 mr-2 border-r pr-2">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            active={editor.isActive({ textAlign: "left" })}
-            icon={<AlignLeft />}
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            active={editor.isActive({ textAlign: "center" })}
-            icon={<AlignCenter />}
-          />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            active={editor.isActive({ textAlign: "right" })}
-            icon={<AlignRight />}
-          />
-        </div>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setParagraph().run()}
+          active={editor.isActive("paragraph")}
+          icon={<Type className="h-4 w-4" />}
+        />
 
-        {/* Media & Others */}
-        <div className="flex gap-1">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            active={editor.isActive("bulletList")}
-            icon={<List />}
-          />
-          <ToolbarButton
-            onClick={setLink}
-            active={editor.isActive("link")}
-            icon={<LinkIcon />}
-          />
+        <Separator orientation="vertical" className="h-6 mx-1" />
 
-          {/* Custom Input File for Image */}
-          <label className="cursor-pointer">
-            <div className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-muted transition-colors">
-              <ImageIcon className="h-4 w-4" />
-            </div>
-            <Input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-          </label>
-        </div>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
+          active={editor.isActive({ textAlign: "left" })}
+          icon={<AlignLeft className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+          active={editor.isActive({ textAlign: "center" })}
+          icon={<AlignCenter className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          active={editor.isActive({ textAlign: "right" })}
+          icon={<AlignRight className="h-4 w-4" />}
+        />
+
+        <Separator orientation="vertical" className="h-6 mx-1" />
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          active={editor.isActive("bulletList")}
+          icon={<ListIcon className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          active={editor.isActive("orderedList")}
+          icon={<ListOrdered className="h-4 w-4" />}
+        />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          active={editor.isActive("blockquote")}
+          icon={<Quote className="h-4 w-4" />}
+        />
+
+        <ToolbarButton
+          onClick={addImage}
+          icon={<ImageIcon className="h-4 w-4" />}
+        />
       </div>
 
-      {/* EDITOR AREA */}
-      <EditorContent
-        editor={editor}
-        className="prose prose-sm dark:prose-invert max-w-none min-h-[300px] p-4 focus:outline-none"
-      />
+      <div className="flex-1 bg-white dark:bg-zinc-950 p-10 md:p-20 cursor-text min-h-125">
+        <EditorContent
+          editor={editor}
+          className="prose prose-stone dark:prose-invert lg:prose-2xl max-w-4xl mx-auto focus:outline-none"
+        />
+      </div>
     </div>
   );
 }
 
-// Sub-komponen tombol agar kode tidak berulang
 function ToolbarButton({
   onClick,
-  active,
+  active = false,
   icon,
 }: {
   onClick: () => void;
-  active: boolean;
+  active?: boolean;
   icon: React.ReactNode;
 }) {
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant={active ? "secondary" : "ghost"}
       size="icon"
-      className={`h-8 w-8 ${active ? "bg-secondary text-secondary-foreground" : ""}`}
+      className={`h-9 w-9 transition-all duration-200 ${active ? "bg-secondary shadow-inner scale-95" : "hover:scale-105"}`}
       onClick={onClick}
     >
-      {React.cloneElement(icon as React.ReactElement)}
+      {icon}
     </Button>
   );
 }
