@@ -1,32 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2 } from "lucide-react";
 import PackageDialog from "@/components/package/package-dialog";
 import { IPackage } from "@/types/package";
-
-const INITIAL_DATA: IPackage[] = [
-  {
-    id: "1",
-    name: "Paket Basic",
-    price: 250000,
-    features: ["Unlimited Dokter", "Bridging BPJS"],
-    isPopular: true,
-  },
-];
+import { DataTablePackage } from "@/components/package/table/data-table";
+import { columnsPakcage } from "@/components/package/table/columns";
 
 export default function Package() {
-  const [packages, setPackages] = useState<IPackage[]>(INITIAL_DATA);
+  const [packages, setPackages] = useState<IPackage[]>([
+    {
+      id: "1",
+      name: "Paket Basic",
+      price: 250000,
+      features: ["Unlimited Dokter", "Bridging BPJS"],
+      isPopular: true,
+    },
+  ]);
+
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -36,6 +26,21 @@ export default function Package() {
     features: [""],
     isPopular: false,
   });
+
+  const handleEdit = (pkg: IPackage) => {
+    setEditingId(pkg.id);
+    setFormData({
+      name: pkg.name,
+      price: pkg.price,
+      features: pkg.features,
+      isPopular: pkg.isPopular,
+    });
+    setIsOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setPackages(packages.filter((p) => p.id !== id));
+  };
 
   const addFeatureField = () =>
     setFormData({ ...formData, features: [...formData.features, ""] });
@@ -87,54 +92,10 @@ export default function Package() {
       </div>
 
       <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama Paket</TableHead>
-              <TableHead>Harga</TableHead>
-              <TableHead>Total Fitur</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {packages.map((pkg) => (
-              <TableRow key={pkg.id}>
-                <TableCell>
-                  <div className="font-medium">{pkg.name}</div>
-                  {pkg.isPopular && (
-                    <Badge variant="secondary" className="text-[10px]">
-                      Populer
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell>Rp {pkg.price.toLocaleString()}</TableCell>
-                <TableCell>{pkg.features.length} Fitur</TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      setEditingId(pkg.id);
-                      setFormData({ ...pkg });
-                      setIsOpen(true);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() =>
-                      setPackages(packages.filter((p) => p.id !== pkg.id))
-                    }
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DataTablePackage
+          columns={columnsPakcage(handleEdit, handleDelete)}
+          data={packages}
+        />
       </div>
     </div>
   );

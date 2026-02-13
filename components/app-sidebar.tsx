@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Newspaper, Package } from "lucide-react";
+import { Instagram, LayoutDashboard, Newspaper, Package } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -30,6 +30,11 @@ const navMain = [
     title: "Package",
     url: "/package",
     icon: Package,
+  },
+  {
+    title: "Sosmed",
+    url: "/sosmed",
+    icon: Instagram,
   },
 ];
 
