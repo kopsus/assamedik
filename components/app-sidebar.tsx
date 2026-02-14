@@ -12,12 +12,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  FileSignature,
+  FileText,
   Instagram,
   LayoutDashboard,
-  Newspaper,
+  LayoutGrid,
+  MessageSquare,
   Package,
-  Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -31,7 +31,7 @@ const navMain = [
   {
     title: "Blog",
     url: "/blog",
-    icon: Newspaper,
+    icon: FileText,
   },
   {
     title: "Package",
@@ -46,12 +46,12 @@ const navMain = [
   {
     title: "Testimonial",
     url: "/testimonial",
-    icon: Users,
+    icon: MessageSquare,
   },
   {
     title: "Fitur",
     url: "/fitur",
-    icon: FileSignature,
+    icon: LayoutGrid,
   },
 ];
 
