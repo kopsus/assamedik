@@ -4,7 +4,7 @@ import { useState } from "react";
 import PackageDialog from "@/components/package/package-dialog";
 import { IPackage } from "@/types/package";
 import { DataTablePackage } from "@/components/package/table/data-table";
-import { columnsPakcage } from "@/components/package/table/columns";
+import { columnsPackage } from "@/components/package/table/columns";
 
 export default function Package() {
   const [packages, setPackages] = useState<IPackage[]>([
@@ -93,7 +93,7 @@ export default function Package() {
 
       <div className="border rounded-lg overflow-hidden">
         <DataTablePackage
-          columns={columnsPakcage(handleEdit, handleDelete)}
+          columns={columnsPackage(handleEdit, handleDelete)}
           data={packages}
         />
       </div>

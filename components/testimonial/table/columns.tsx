@@ -1,48 +1,37 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { IPackage } from "@/types/package";
+import { ITestimony } from "@/types/testimonail";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2 } from "lucide-react";
 
-export const columnsPackage = (
-  onEdit: (pkg: IPackage) => void,
+export const columnsTestimonial = (
+  onEdit: (pkg: ITestimony) => void,
   onDelete: (id: string) => void,
-): ColumnDef<IPackage>[] => [
+): ColumnDef<ITestimony>[] => [
   {
     accessorKey: "name",
-    header: "Nama Paket",
+    header: "User",
     cell: ({ row }) => {
-      const pkg = row.original;
-
+      const t = row.original;
       return (
-        <div>
-          <div className="font-medium">{pkg.name}</div>
-          {pkg.isPopular && (
-            <Badge variant="secondary" className="text-[10px]">
-              Populer
-            </Badge>
-          )}
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={t.avatar} />
+            <AvatarFallback>{t.name.substring(0, 2)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-bold text-sm">{t.name}</span>
+            <span className="text-[11px] text-muted-foreground">{t.role}</span>
+          </div>
         </div>
       );
     },
   },
   {
-    accessorKey: "price",
-    header: "Harga",
-    cell: ({ row }) => {
-      const price = row.original.price;
-      return <div>Rp {price.toLocaleString()}</div>;
-    },
-  },
-  {
-    accessorKey: "features",
-    header: "Total Fitur",
-    cell: ({ row }) => {
-      const features = row.original.features;
-      return <div>{features.length} Fitur</div>;
-    },
+    accessorKey: "content",
+    header: "Testimoni",
   },
   {
     id: "actions",
