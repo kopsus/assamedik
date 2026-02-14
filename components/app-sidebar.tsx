@@ -12,6 +12,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
+  FileSignature,
   Instagram,
   LayoutDashboard,
   Newspaper,
@@ -46,6 +47,11 @@ const navMain = [
     title: "Testimonial",
     url: "/testimonial",
     icon: Users,
+  },
+  {
+    title: "Fitur",
+    url: "/fitur",
+    icon: FileSignature,
   },
 ];
 
